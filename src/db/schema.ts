@@ -6,6 +6,11 @@ export const usageEnum= pgEnum("usage_status",[
     "rejected", "approved"
 ]);
 
+export const planTypeEnum = pgEnum("plan_type", [
+    "predefined",
+    "custom",
+]);
+
 export const plan= pgTable("plan",{
     id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -13,6 +18,9 @@ export const plan= pgTable("plan",{
     name:varchar("name", { length: 255 }).notNull(),
     monthlyLimit: integer("monthly_limit").notNull(),
     maxUnitsPerRequest: integer("max_units_per_request").notNull(),
+    type: planTypeEnum("type")
+        .notNull()
+        .default("predefined"),
 });
 
 export const account=pgTable("account",{

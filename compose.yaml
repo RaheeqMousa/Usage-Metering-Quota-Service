@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: usage_metering
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: dev_password_change_me
+      POSTGRES_PASSWORD: 0000
     ports:
       - "5432:5432"
     volumes:
