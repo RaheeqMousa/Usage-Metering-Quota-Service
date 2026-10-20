@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+.env
+.restore-migration-temp
+coverage
+*.log

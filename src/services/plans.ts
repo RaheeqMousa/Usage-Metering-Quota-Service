@@ -1,5 +1,5 @@
-import {insertPlan, getAllPlans, getPlanById, updateCustomPlan, PlanType} from "../db/queries/plans.js";
-import {account, newPlan} from '../db/schema.js'
+import {insertPlan, getAllPlans, getPlanById, updateCustomPlan, PlanType, getPredefinedPlanByName,} from "../db/queries/plans.js";
+import {newPlan} from '../db/schema.js'
 
 export type CreatePlanInput = {
   name: string;
@@ -101,12 +101,13 @@ export async function seedPlans() {
   ];
 
   for (const plan of predefinedPlans) {
-    await insertPlan(
-      plan.name,
-      plan.monthlyLimit,
-      plan.maxUnitsPerRequest,
-      "predefined",
-      null
-    );
+    const existing = await getPredefinedPlanByName(plan.name);
+
+    if (!existing) {
+      await insertPlan(plan.name, plan.monthlyLimit, plan.maxUnitsPerRequest,
+        "predefined", null
+      );
+    }
   }
+  
 }

@@ -10,8 +10,9 @@
     "dev": "tsx watch src/app.ts",
     "cli": "tsx src/cli.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/src/app.js",
     "seed": "tsx src/services/seed.ts",
+    "migrate": "drizzle-kit migrate",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -1,13 +1,11 @@
-
 services:
   postgres:
     image: postgres:17
-    container_name: usage-metering-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: usage_metering
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0000
+      POSTGRES_PASSWORD: "0000"
     ports:
       - "5432:5432"
     volumes:
@@ -16,7 +14,38 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres -d usage_metering"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgresql://postgres:0000@postgres:5432/usage_metering
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm run migrate && npm run seed && npm start"
+
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    profiles: ["tools"]
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgresql://postgres:0000@postgres:5432/usage_metering
+    depends_on:
+      api:
+        condition: service_started
+    volumes:
+      - cli_home:/root
+    entrypoint: ["npm", "run", "cli", "--"]
 
 volumes:
   postgres_data:
+  cli_home:
