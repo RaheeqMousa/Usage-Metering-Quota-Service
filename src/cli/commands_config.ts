@@ -268,7 +268,7 @@ export async function sumApprovedUsageHandler(_cmdName: string,...args: string[]
 
   if (!startArg || !endArg) {
     throw new Error(
-      "Usage: sum-approved-usage <startDate> <endDate>"
+      "Usage: account-sum-approved-usage <startDate> <endDate>"
     );
   }
 
@@ -358,7 +358,7 @@ export async function updateUserPlanHandler(_cmdName: string,...args: string[]):
   const [userId, planId] = args;
 
   if (!userId|| !planId) {
-    throw new Error("command: update-user-plan <userId> <planId>");
+    throw new Error("command: change-user-plan <userId> <planId>");
   }
 
   const { accountId } = await getLoggedInCredentials();
@@ -457,3 +457,67 @@ export async function consumeUsageHandler(_cmdName: string,...args: string[]): P
   console.log(result);
 }
 
+export function help() {
+  console.log(`
+Usage Metering and Quota Service CLI
+
+Usage:
+  npm run cli -- <command>
+
+PLAN COMMANDS
+  plans                       List available plans
+                              npm run cli -- plans
+  plan                        Get details of a plan
+                              npm run cli -- plan <plan-id>
+  create-plan                 Create a custom plan
+                              npm run cli -- create-plan <name> <monthlyLimit> <maxUnitsPerRequest>
+  edit-custom-plan            Edit a custom plan
+                              npm run cli -- edit-custom-plan <planId> <name> <monthlyLimit> <maxUnitsPerRequest>
+
+ACCOUNT COMMANDS
+  login                       Log in to an account
+                              npm run cli -- login <apiKey>
+  logout                      Log out of an account
+                              npm run cli -- logout
+  create-account              Create a new account
+                              npm run cli -- create-account <accountName> <planId>
+  my-account                  View account details
+                              npm run cli -- my-account
+  change-account-plan         Change the account plan
+                              npm run cli -- change-account-plan <planId>
+  account-usage-plan          View the account's usage plan
+                              npm run cli -- account-usage-plan
+  account-usage-history       View account usage history
+                              npm run cli -- account-usage-history
+  account-sum-approved-usage  Sum approved account usage
+                              npm run cli -- account-sum-approved-usage <startDate> <endDate>
+  account-usage               View account usage
+                              npm run cli -- account-usage
+
+USER COMMANDS
+  list-users                  List account users
+                              npm run cli -- list-users
+  get-user                    Get user details
+                              npm run cli -- get-user <user-id>
+  create-user                 Create a user
+                              npm run cli -- create-user <userName> <planId>
+  change-user-plan            Change a user's plan
+                              npm run cli -- change-user-plan <userId> <planId>
+  user-usage                  View user usage
+                              npm run cli -- user-usage <userId>
+  user-usage-history          View user usage history
+                              npm run cli -- user-usage-history <userId>
+
+USAGE COMMANDS
+  consume-usage               Submit a usage request
+                              npm run cli -- consume-usage <userId> <units>
+
+HELP
+  help                        Display available commands
+                              npm run cli -- help
+`);
+}
+
+export async function helpHandler(_cmdName: string): Promise<void> {
+  help();
+}

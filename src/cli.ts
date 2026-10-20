@@ -4,10 +4,14 @@ import {registerCommand, runCommand, CommandsRegistry,
     getAccountUsageHistoryHandler,sumApprovedUsageHandler,getAccountUsageHandler, loginHandler, logoutHandler, 
     getAllUsersHandler,getUserHandler,createUserHandler,
     updateUserPlanHandler, getUserUsageHandler,getUserUsageHistoryHandler, 
-    consumeUsageHandler,} from "./cli/commands_config.js";
+    consumeUsageHandler, helpHandler} from "./cli/commands_config.js";
 
 async function main(): Promise<void> {
     const register: CommandsRegistry = {};
+
+    //help command
+    registerCommand(register, "help", helpHandler);
+
     //plan commands
     registerCommand(register, "plans", getPlansHandler);
     registerCommand(register, "plan", getPlanHandler);
@@ -18,7 +22,7 @@ async function main(): Promise<void> {
     registerCommand(register, "login", loginHandler);
     registerCommand(register, "logout", logoutHandler);
     registerCommand(register, "create-account", createAccountHandler);
-    registerCommand(register, "get-account", getAccountHandler);
+    registerCommand(register, "my-account", getAccountHandler);
     registerCommand(register, "change-account-plan", updateAccountPlanHandler);
     registerCommand(register, "account-usage-plan", getAccountUsagePlanHandler);
     registerCommand(register, "account-usage-history", getAccountUsageHistoryHandler);
