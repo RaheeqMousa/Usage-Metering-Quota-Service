@@ -203,10 +203,12 @@ export async function createAccountHandler(_cmdName: string, args: string): Prom
   }
 
   const result = await createAccount({ name });
+  await saveCredintials(result.apiKey);
 
   console.log("Account created successfully");
   console.log("Account:", result.account);
   console.log("API key (save it now):", result.apiKey);
+  console.log("Logged in automatically")
 }
 
 
@@ -478,7 +480,7 @@ ACCOUNT COMMANDS
   logout                      Log out of an account
                               logout
   create-account              Create a new account
-                              create-account <accountName> <planId>
+                              create-account <accountName>
   my-account                  View account details
                               my-account
   change-account-plan         Change the account plan
