@@ -1,16 +1,23 @@
 import {insertPlan, getAllPlans, getPlanById, updateCustomPlan, PlanType} from "../db/queries/plans.js";
-import {newPlan} from '../db/schema.js'
+import {account, newPlan} from '../db/schema.js'
 
-type CreatePlanInput = {
+export type CreatePlanInput = {
   name: string;
   monthlyLimit: number;
   maxUnitsPerRequest: number;
   type: PlanType;
+  ownerAccountId: string|null;
 };
 
 export async function createPlan(input: CreatePlanInput): Promise<newPlan>{
-    const {name, monthlyLimit, maxUnitsPerRequest, type}= input;
+    const {name, monthlyLimit, maxUnitsPerRequest, type, ownerAccountId}= input;
 
+    if(type!=="custom"){
+        throw new Error("Only custom plans can be created through this operation");
+    }
+    if (!ownerAccountId) {
+        throw new Error("Account ID is required for custom plans");
+    }
     if(name.trim().length==0){
         throw new Error("Plan name cannot be empty");
     }
@@ -26,11 +33,14 @@ export async function createPlan(input: CreatePlanInput): Promise<newPlan>{
         throw new Error("Maximum units per request cannot exceed the monthly limit");
     }
 
-    return await insertPlan(name.trim(), monthlyLimit, maxUnitsPerRequest, type);
+    return await insertPlan(name.trim(), monthlyLimit, maxUnitsPerRequest, type, ownerAccountId);
 }
 
-export async function getPlans() {
-  return await getAllPlans();
+export async function getPlans(accountId: string) {
+  if(!accountId || typeof accountId!=="string"){
+    throw new Error("login in first to view plans")
+  }
+  return await getAllPlans(accountId);
 }
 
 export async function getPlan(planId: string){
@@ -44,7 +54,7 @@ export async function getPlan(planId: string){
   return result;
 }
 
-export async function editCustomPlan(planId: string, name: string, monthlyLimit: number, maxUnitsPerRequest: number) {
+export async function editCustomPlan(planId: string, name: string, monthlyLimit: number, maxUnitsPerRequest: number, accountId: string) {
   if(planId.trim().length==0){
     throw new Error("Plan ID cannot be empty");
   }
@@ -60,7 +70,24 @@ export async function editCustomPlan(planId: string, name: string, monthlyLimit:
   if (maxUnitsPerRequest > monthlyLimit) {
     throw new Error("Maximum units per request cannot exceed the monthly limit");
   }
-  return await updateCustomPlan(planId, name, monthlyLimit, maxUnitsPerRequest);
+  if (!accountId) {
+    throw new Error("Account ID is required for custom plans");
+  }
+
+
+  const existingPlan = await getPlanById(planId);
+
+  if (!existingPlan) {
+    throw new Error("Plan not found");
+  }
+  if (existingPlan.type !== "custom") {
+    throw new Error("Predefined plans cannot be edited");
+  }
+  if (existingPlan.ownerAccountId !== accountId) {
+    throw new Error("You cannot edit another account's custom plan");
+  }
+
+  return await updateCustomPlan(planId, name, monthlyLimit, maxUnitsPerRequest, accountId);
 }
 
 
@@ -79,6 +106,7 @@ export async function seedPlans() {
       plan.monthlyLimit,
       plan.maxUnitsPerRequest,
       "predefined",
+      null
     );
   }
 }

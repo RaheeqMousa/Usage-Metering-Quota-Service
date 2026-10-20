@@ -1,11 +1,22 @@
 import {db} from "../index.js";
 import {newPlan, plan} from "../schema.js";
-import {eq, and} from "drizzle-orm";
+import {eq, and, or} from "drizzle-orm";
 
 export type PlanType = "predefined" | "custom";
 
-export async function getAllPlans(){
-  return await db.select().from(plan);
+export async function getAllPlans(accountId: string) {
+  return db
+    .select()
+    .from(plan)
+    .where(
+      or(
+        eq(plan.type, "predefined"),
+        and(
+          eq(plan.type, "custom"),
+          eq(plan.ownerAccountId, accountId)
+        )
+      )
+    );
 }
 
 export async function getPlanById(planId: string) {
@@ -13,31 +24,40 @@ export async function getPlanById(planId: string) {
   return result;
 }
 
-export async function insertPlan(name: string, monthlyLimit: number, maxUnitsPerRequest: number, type:PlanType) {
+export async function insertPlan(name: string, monthlyLimit: number, maxUnitsPerRequest: number, type:PlanType, ownerAccountId:string|null) {
   const [p]= await db.insert(plan).values({
     name: name.trim(),
     monthlyLimit: monthlyLimit,
     maxUnitsPerRequest: maxUnitsPerRequest,
-    type
+    type,
+    ownerAccountId:ownerAccountId,
   }).returning();
 
   return p;
 }
 
-export async function updateCustomPlan(planId: string, name: string, monthlyLimit: number, maxUnitsPerRequest: number) {
-  const [updatedPlan]= await db
-  .update(plan)
-  .set({
-    name:name,
-    monthlyLimit:monthlyLimit,
-    maxUnitsPerRequest:maxUnitsPerRequest,
-    updatedAt: new Date()
-  })
-  .where(and(
-            eq(plan.id, planId),
-            eq(plan.type, "custom"),
-          ),)
-  .returning();
+export async function updateCustomPlan(planId: string, name: string, monthlyLimit: number, maxUnitsPerRequest: number, accountId:string) {
 
-  return updatedPlan;
+  const [result] = await db
+    .update(plan)
+    .set({
+      name,
+      monthlyLimit,
+      maxUnitsPerRequest,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(plan.id, planId),
+        eq(plan.type, "custom"),
+        eq(plan.ownerAccountId, accountId),
+      ),
+    )
+    .returning();
+
+  if (!result) {
+    throw new Error("Custom plan not found or access denied");
+  }
+
+  return result;
 }

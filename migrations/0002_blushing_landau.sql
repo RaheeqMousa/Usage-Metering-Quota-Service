@@ -1,0 +1,1 @@
+ALTER TABLE "plan" ADD COLUMN "owner_account_id" uuid;

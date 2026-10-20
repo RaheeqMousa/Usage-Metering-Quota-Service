@@ -3,7 +3,7 @@ import {getAccountDetails, insertAccount, updateAccountPlan, findAccountUsagePla
 } from "../db/queries/accounts.js";
 import { getPlanById } from "../db/queries/plans.js";
 import {createHash,randomBytes } from "node:crypto"
-import { account } from "../db/schema.js";
+import { findAccountByApiKeyHash } from "../db/queries/accounts.js";
 
 type CreateAccountInput = {
   name: string;
@@ -33,6 +33,10 @@ export async function createAccount(input: CreateAccountInput): Promise<CreateAc
     const plan= await getPlanById(planId);
     if(!plan){
         throw new Error("Selected plan not found");
+    }
+
+    if (plan.type === "custom") {
+        throw new Error("You cannot use another account's custom plan");
     }
 
     const apiKey= randomBytes(32).toString("hex");
@@ -73,6 +77,10 @@ export async function editAccountPlan(accountId: string, planId: string,) {
     const plan= await getPlanById(planId);
     if(!plan){
         throw new Error("Selected plan not found");
+    }
+
+    if (plan.type === "custom" && plan.ownerAccountId !== accountId) {
+        throw new Error("You cannot use another account's custom plan");
     }
 
     return await updateAccountPlan(accountId,planId);
@@ -129,4 +137,26 @@ export async function sumApprovedUsage(accountId: string, start:Date, end:Date){
 
 export async function getAccountUsage(accountId:string){
     return await accountUsage(accountId);
+}
+
+export async function authenticateApiKey(apiKey: string, expectedAccountId?: string): Promise<string> {
+  if (!apiKey?.trim()) {
+    throw new Error("API key is required");
+  }
+
+  const hashedApiKey = createHash("sha256")
+    .update(apiKey)
+    .digest("hex");
+
+  const matchedAccount = await findAccountByApiKeyHash(hashedApiKey);
+
+  if (!matchedAccount) {
+    throw new Error("Invalid API key");
+  }
+
+  if (expectedAccountId &&matchedAccount.id !== expectedAccountId){
+    throw new Error("API key does not belong to this account");
+  }
+
+  return matchedAccount.id;
 }

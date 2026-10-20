@@ -1,9 +1,9 @@
-import { and, eq, gte, lt, sql } from "drizzle-orm";
+import { and, eq,} from "drizzle-orm";
 import { db } from "../index.js";
 import { account, user, plan, usageRequest } from "../schema.js";
 import {getMonthBoundaries} from '../../utilities/utilities.js';
 import {sumApprovedAccountUsageTrans} from './accounts.js';
-import {sumApprovedUserUsage, getUserById} from './users.js';
+import {sumApprovedUserUsage} from './users.js';
 
 export async function consumeUsageDb(accountId: string, userId: string, requestId: string, units:number){
     return db.transaction(async (trans)=>{
@@ -34,7 +34,16 @@ export async function consumeUsageDb(accountId: string, userId: string, requestI
             request: existing}
         }
 
-        const foundUser = await getUserById(userId, accountId);
+        const [foundUser] = await trans
+        .select()
+        .from(user)
+        .where(
+            and(
+                eq(user.id, userId),
+                eq(user.accountId, accountId)
+            )
+        )
+        .limit(1);
 
         if (!foundUser) throw new Error("User not found");
 
@@ -58,10 +67,6 @@ export async function consumeUsageDb(accountId: string, userId: string, requestI
 
         const accountConsume= Number(await sumApprovedAccountUsageTrans(trans,accountId, monthStart, nextMonthStart));
         const userConsume= Number(await sumApprovedUserUsage(trans,userId, accountId, monthStart, nextMonthStart));
-
-        console.log("consumed units by user: "+userConsume);
-        console.log("requested units: "+units);
-        console.log("limit user plan: "+userPlan.monthlyLimit);
 
         let reason: string|null=null;
 
