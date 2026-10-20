@@ -61,3 +61,18 @@ export async function updateCustomPlan(planId: string, name: string, monthlyLimi
 
   return result;
 }
+
+export async function getPredefinedPlanByName(name: string) {
+  const [result] = await db
+    .select()
+    .from(plan)
+    .where(
+      and(
+        eq(plan.name, name),
+        eq(plan.type, "predefined")
+      )
+    )
+    .limit(1);
+
+  return result;
+}

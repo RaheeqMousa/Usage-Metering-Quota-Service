@@ -87,6 +87,7 @@ function makeQuery(result: unknown) {
 function setupTransaction() {
     const accountQuery = makeQuery([mockAccount]);
     const duplicateQuery = makeQuery([]);
+    const userQuery = makeQuery([mockUser]);
     const accountPlanQuery = makeQuery([mockAccountPlan]);
     const userPlanQuery = makeQuery([mockUserPlan]);
 
@@ -102,6 +103,7 @@ function setupTransaction() {
         select: vi.fn()
             .mockReturnValueOnce(accountQuery)
             .mockReturnValueOnce(duplicateQuery)
+            .mockReturnValueOnce(userQuery)
             .mockReturnValueOnce(accountPlanQuery)
             .mockReturnValueOnce(userPlanQuery),
 
@@ -127,6 +129,7 @@ function setupTransaction() {
     return {
         accountQuery,
         duplicateQuery,
+        userQuery,
         accountPlanQuery,
         userPlanQuery,
         tx,
@@ -173,9 +176,9 @@ describe("consumeUsageDb", () => {
     });
 
     it("throws when the user does not exist", async () => {
-        setupTransaction();
+        const { userQuery } = setupTransaction();
 
-        vi.mocked(getUserById).mockResolvedValue(undefined as never);
+        userQuery.limit.mockResolvedValue([]);
 
         await expect(
             consumeUsageDb("account-1", "user-1", "request-1", 50),
