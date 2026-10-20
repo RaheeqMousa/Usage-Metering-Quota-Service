@@ -74,5 +74,5 @@ export async function getPredefinedPlanByName(name: string) {
     )
     .limit(1);
 
-  return result;
+  return result ?? null;
 }

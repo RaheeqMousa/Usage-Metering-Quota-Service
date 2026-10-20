@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {getAccountDetails, insertAccount, updateAccountPlan,findAccountUsagePlan,
 sumApprovedAccountUsage, findAccountUsageHistory,accountUsage, findAccountByApiKeyHash} from "../../src/db/queries/accounts.js";
-import { getPlanById } from "../../src/db/queries/plans.js";
+import { getPlanById, getPredefinedPlanByName } from "../../src/db/queries/plans.js";
 import {createAccount, getMyAccount, editAccountPlan, getAccountUsagePlan, getAccountUsageHistory,
   sumApprovedUsage, getAccountUsage, authenticateApiKey} from "../../src/services/accounts.js";
 
@@ -59,36 +59,13 @@ const mockAccountDetails = {
 };
 
 describe("createAccount", () => {
-    it("rejects to create ac ccount with an empty name", async ()=>{
-        await expect(createAccount({name:" ", planId:"plan-1"}))
-        .rejects
-        .toThrow("Account name cannot be empty")
+    it("rejects to create an account with an empty name", async () => {
+        await expect(createAccount({ name: " " }))
+            .rejects
+            .toThrow("Account name cannot be empty");
 
-        expect(getPlanById).not.toHaveBeenCalled();
-        expect(insertAccount).not.toHaveBeenCalled()
+        expect(insertAccount).not.toHaveBeenCalled();
     });
-
-    it("rejects to create ac account with an empty plan id", async ()=>{
-        await expect(createAccount({name:"ahmad", planId:""}))
-        .rejects
-        .toThrow("Plan ID cannot be empty")
-
-        expect(getPlanById).not.toHaveBeenCalled();
-        expect(insertAccount).not.toHaveBeenCalled()
-    });
-
-    it("rejects to create an account when the selected plan not found", async ()=>{
-        vi.mocked(getPlanById).mockResolvedValue(undefined as never);
-
-        await expect(createAccount({name:"ahmad", planId:"plan-1"}))
-        .rejects
-        .toThrow("Selected plan not found")
-
-        expect(getPlanById).toHaveBeenCalledWith("plan-1");
-        expect(insertAccount).not.toHaveBeenCalled()
-    });
-
-
 });
 
 

@@ -7,9 +7,9 @@ const router= Router();
 //create a new account
 router.post('/', async (req, res) => {
     try{
-        const { name, planId } = req.body;
+        const { name } = req.body;
 
-        const account = await createAccount({name, planId});
+        const account = await createAccount({name});
         res.status(201).json(account);
     }catch(err){
         res.status(500).json({error: (err as Error).message})

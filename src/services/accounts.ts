@@ -1,13 +1,12 @@
 import {getAccountDetails, insertAccount, updateAccountPlan, findAccountUsagePlan, 
     sumApprovedAccountUsage, findAccountUsageHistory, accountUsage
 } from "../db/queries/accounts.js";
-import { getPlanById } from "../db/queries/plans.js";
+import {getPlanById,getPredefinedPlanByName} from "../db/queries/plans.js";
 import {createHash,randomBytes } from "node:crypto"
 import { findAccountByApiKeyHash } from "../db/queries/accounts.js";
 
 type CreateAccountInput = {
   name: string;
-  planId: string;
 };
 export type CreatedAccount = {
   id: string;
@@ -21,18 +20,17 @@ export type CreateAccountOutput={
 }
 
 export async function createAccount(input: CreateAccountInput): Promise<CreateAccountOutput> {
-    const { name, planId } = input;
+    const { name } = input;
 
     if(input.name?.trim().length==0){
         throw new Error("Account name cannot be empty");
     }
-    if(input.planId?.trim().length==0){
-        throw new Error("Plan ID cannot be empty");
-    }
 
-    const plan= await getPlanById(planId);
-    if(!plan){
-        throw new Error("Selected plan not found");
+    const plan = await getPredefinedPlanByName("Starter");
+    if (!plan) {
+        throw new Error(
+            "Starter plan not found. Please seed the predefined plans first."
+        );
     }
 
     if (plan.type === "custom") {
@@ -47,7 +45,7 @@ export async function createAccount(input: CreateAccountInput): Promise<CreateAc
     const createdAccount = await insertAccount(
         name,
         hashedApiKey,
-        planId,
+        plan.id,
     );
 
     // return the raw API key only once.

@@ -194,21 +194,19 @@ export async function logoutHandler(_cmdName: string): Promise<void> {
   }
 }
 
-export async function createAccountHandler(_cmdName: string,...args: string[]): Promise<void> {
-  const [name, planId] = args;
 
-  if (!name || !planId) {
-    throw new Error("command: create-account <name> <planId>");
+export async function createAccountHandler(_cmdName: string, args: string): Promise<void> {
+  const name = args.trim().replace(/^["']|["']$/g, "");
+
+  if (!name) {
+    throw new Error("Usage: create-account <name>");
   }
 
-  const result = await createAccount({ name, planId });
-
-  // automatic log in using the new account's API key.
-  await saveCredintials(result.apiKey);
+  const result = await createAccount({ name });
 
   console.log("Account created successfully");
   console.log("Account:", result.account);
-  console.log("Logged in automatically");
+  console.log("API key (save it now):", result.apiKey);
 }
 
 
