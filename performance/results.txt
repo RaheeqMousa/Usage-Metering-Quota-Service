@@ -1,0 +1,21 @@
+
+..........sequential requests test...........
+Total requests: 10
+Successful requests: 10
+Failed requests: 0
+Total time: 143 ms
+Average time: 14.30 ms
+
+..........sequential requests test...........
+Total requests: 100
+Successful requests: 100
+Failed requests: 0
+Total time: 1094 ms
+Average time: 10.94 ms
+
+..........Concurrent Test...........
+Total requests: 100
+Successful requests: 100
+Failed requests: 0
+Total time: 1381 ms
+Average time: 13.81 ms

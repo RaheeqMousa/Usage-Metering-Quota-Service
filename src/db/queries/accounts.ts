@@ -189,3 +189,15 @@ export async function accountUsage(id: string){
         maxUnitsPerRequest: Number(result.maxUnitsPerRequest),
     };
 }
+
+export async function findAccountByApiKeyHash(apiKeyHash: string){
+  const [result] = await db
+    .select({
+      id: account.id,
+    })
+    .from(account)
+    .where(eq(account.apiKeyHash, apiKeyHash))
+    .limit(1);
+
+  return result ?? null;
+}

@@ -21,6 +21,7 @@ export const plan= pgTable("plan",{
     type: planTypeEnum("type")
         .notNull()
         .default("predefined"),
+    ownerAccountId: uuid("owner_account_id"),
 });
 
 export const account=pgTable("account",{

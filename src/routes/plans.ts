@@ -1,12 +1,13 @@
+import { authenticateAccount, AuthRequest } from "../middleware/authentication.js";
 import {getPlan, getPlans, createPlan, editCustomPlan} from "../services/plans.js";
 import {Router} from "express";
 
 export const router= Router();
 
 //get all plans
-router.get('/',async (req,res)=>{
+router.get('/', authenticateAccount,async (req:AuthRequest,res)=>{
     try{
-        const plans= await getPlans();
+        const plans= await getPlans(req.accountId!);
         res.status(200).json(plans);
     }catch(err){
         res.status(500).json({
@@ -32,10 +33,10 @@ router.get('/:planId',async (req,res)=>{
 });
 
 // create a new plan
-router.post('/',async (req,res)=>{
+router.post('/', authenticateAccount,async (req:AuthRequest,res)=>{
     try{
         const {name, monthlyLimit, maxUnitsPerRequest, type}= req.body;
-        const plan= await createPlan({name, monthlyLimit, maxUnitsPerRequest,type});
+        const plan= await createPlan({name, monthlyLimit, maxUnitsPerRequest,type, ownerAccountId:req.accountId!});
         res.status(201).json(plan);
     }catch(err){
         res.status(500).json({
@@ -45,11 +46,15 @@ router.post('/',async (req,res)=>{
 });
 
 // update a custom plan
-router.put('/:planId',async (req,res)=>{
+router.put('/:planId',authenticateAccount,async (req:AuthRequest,res)=>{
     try{
         const planId= req.params.planId;
+
         const {name, monthlyLimit, maxUnitsPerRequest}= req.body;
-        const plan= await editCustomPlan(planId, name, monthlyLimit, maxUnitsPerRequest);
+         if(typeof(planId)!=="string"){
+            return res.status(400).json({error:"Invalid plan ID"});
+        }
+        const plan= await editCustomPlan(planId, name, monthlyLimit, maxUnitsPerRequest, req.accountId!);
         res.status(200).json(plan);
     }catch(err){
         res.status(500).json({
