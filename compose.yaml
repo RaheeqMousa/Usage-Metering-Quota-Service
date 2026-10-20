@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: usage_metering
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "0000"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     environment:
       PORT: "3000"
-      DATABASE_URL: postgresql://postgres:0000@postgres:5432/usage_metering
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/usage_metering
     ports:
       - "3000:3000"
     depends_on:
@@ -38,7 +38,7 @@ services:
     profiles: ["tools"]
     environment:
       PORT: "3000"
-      DATABASE_URL: postgresql://postgres:0000@postgres:5432/usage_metering
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/usage_metering
     depends_on:
       api:
         condition: service_started
