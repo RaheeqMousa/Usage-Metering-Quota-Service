@@ -196,7 +196,7 @@ export async function logoutHandler(_cmdName: string): Promise<void> {
 
 
 export async function createAccountHandler(_cmdName: string, args: string): Promise<void> {
-  const name = args.trim().replace(/^["']|["']$/g, "");
+  const name = args.trim();
 
   if (!name) {
     throw new Error("Usage: create-account <name>");

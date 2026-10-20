@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {insertPlan, getAllPlans, getPlanById, updateCustomPlan,} from "../../src/db/queries/plans.js";
-import {createPlan,getPlans, getPlan,editCustomPlan,seedPlans,} from "../../src/services/plans.js";
+import {createPlan,getPlans, getPlan,editCustomPlan} from "../../src/services/plans.js";
 
 
 vi.mock("../../src/db/queries/plans.js", ()=>({

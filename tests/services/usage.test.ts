@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { consumeUsageDb } from "../../src/db/queries/usage.js";
 import { consumeUsage } from "../../src/services/usage.js";

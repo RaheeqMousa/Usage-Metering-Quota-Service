@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {getAccountDetails, insertAccount, updateAccountPlan,findAccountUsagePlan,
 sumApprovedAccountUsage, findAccountUsageHistory,accountUsage, findAccountByApiKeyHash} from "../../src/db/queries/accounts.js";
-import { getPlanById, getPredefinedPlanByName } from "../../src/db/queries/plans.js";
+import { getPlanById } from "../../src/db/queries/plans.js";
 import {createAccount, getMyAccount, editAccountPlan, getAccountUsagePlan, getAccountUsageHistory,
   sumApprovedUsage, getAccountUsage, authenticateApiKey} from "../../src/services/accounts.js";
 

@@ -1,5 +1,5 @@
 import {db} from "../index.js";
-import {newPlan, plan} from "../schema.js";
+import {plan} from "../schema.js";
 import {eq, and, or} from "drizzle-orm";
 
 export type PlanType = "predefined" | "custom";
