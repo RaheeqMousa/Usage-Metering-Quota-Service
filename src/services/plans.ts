@@ -37,20 +37,28 @@ export async function createPlan(input: CreatePlanInput): Promise<newPlan>{
 }
 
 export async function getPlans(accountId: string) {
-  if(!accountId || typeof accountId!=="string"){
-    throw new Error("login in first to view plans")
+  if(accountId.trim().length === 0 || typeof accountId!=="string"){
+    throw new Error("Login in first to view plans")
   }
   return await getAllPlans(accountId);
 }
 
-export async function getPlan(planId: string){
-  if(planId.trim().length==0){
+export async function getPlan(planId: string, accountId:string){
+  if (typeof accountId !== "string" || accountId.trim().length === 0) {
+    throw new Error("Login first to view a plan");
+  }
+  if(planId.trim().length===0){
     throw new Error("Plan ID cannot be empty");
   }
+
   const result= await getPlanById(planId);
   if(!result){
     throw new Error("Plan not found");
   }
+  if(result.type!=="predefined" && result.ownerAccountId!==accountId){
+    throw new Error("You cannot view another account's custom plan");
+  }
+
   return result;
 }
 

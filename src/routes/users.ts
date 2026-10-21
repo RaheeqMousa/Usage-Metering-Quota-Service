@@ -135,7 +135,10 @@ router.get('/:userId/history', authenticateAccount, async(req:AuthRequest,res)=>
         if(typeof(userId)!=="string"){
             return res.status(400).json({error:"Invalid user ID"});
         }
-        const result= await getUserUsageHistory(userId,req.accountId!);
+        const limit = Number(req.query.limit ?? 5);
+        const offset = Number(req.query.offset ?? 0);
+
+        const result= await getUserUsageHistory(userId,req.accountId!, limit, offset);
         
         if(!result){
             return res.status(404).json({error:"user not found"});

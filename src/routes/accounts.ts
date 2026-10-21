@@ -55,7 +55,7 @@ router.get("/my/plan", authenticateAccount, async (req: AuthRequest, res) => {
 //this returns the usage history of an account
 router.get("/my/history", authenticateAccount, async (req: AuthRequest, res)=>{
     try{
-        const limit = Number(req.query.limit ?? 10);
+        const limit = Number(req.query.limit ?? 5);
         const offset = Number(req.query.offset ?? 0);
 
         const history = await getAccountUsageHistory(

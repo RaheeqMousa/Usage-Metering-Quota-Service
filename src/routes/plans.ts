@@ -17,10 +17,21 @@ router.get('/', authenticateAccount,async (req:AuthRequest,res)=>{
 });
 
 // get plan by id
-router.get('/:planId',async (req,res)=>{
+router.get('/:planId', authenticateAccount ,async (req:AuthRequest,res)=>{
     try{
         const planId= req.params.planId;
-        const plan= await getPlan(planId);
+        const accountId= req.accountId;
+        if (!accountId || typeof accountId !== "string") {
+            return res.status(401).json({
+            error: "login first to view a plan",
+            });
+        }
+        if (typeof planId!== "string" || planId.trim().length === 0){
+            return res.status(400).json({
+                error: "Plan ID is required",});
+        }
+        const plan= await getPlan(planId, req.accountId!);
+
         if(!plan){
             return res.status(404).json("Plan not found");
         }

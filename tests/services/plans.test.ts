@@ -141,7 +141,7 @@ describe("get plans",()=>{
     it("throw when no account id passed", async()=>{
         await expect(
             getPlans("")
-        ).rejects.toThrow("login in first to view plans");
+        ).rejects.toThrow("Login in first to view plans");
 
         expect(getAllPlans).not.toHaveBeenCalled();
     });
@@ -163,10 +163,10 @@ describe("get plans",()=>{
 
 
 describe("get plan", () => {
-    it("returns a plan by ID", async () => {
+    it("returns a plan by valid ID and account id", async () => {
         vi.mocked(getPlanById).mockResolvedValue(mockPlan);
 
-        const result = await getPlan("plan-1");
+        const result = await getPlan("plan-1","account-1");
 
         expect(result).toEqual(mockPlan);
         expect(getPlanById).toHaveBeenCalledWith("plan-1");
@@ -174,8 +174,16 @@ describe("get plan", () => {
 
     it("rejects an empty plan id", async () => {
         await expect(
-            getPlan(" ")
+            getPlan(" ", "account-1")
         ).rejects.toThrow("Plan ID cannot be empty");
+
+        expect(getPlanById).not.toHaveBeenCalled();
+    });
+
+    it("rejects an empty account id", async () => {
+        await expect(
+            getPlan("plan-1", "")
+        ).rejects.toThrow("Login first to view a plan");
 
         expect(getPlanById).not.toHaveBeenCalled();
     });
@@ -184,11 +192,21 @@ describe("get plan", () => {
         vi.mocked(getPlanById).mockResolvedValue(undefined as never);
 
         await expect(
-            getPlan("plan-3")
+            getPlan("plan-3", "account-1")
         ).rejects.toThrow("Plan not found");
 
         expect(getPlanById).toHaveBeenCalledWith("plan-3");
     });
+
+    it("rejects when the plan isn't a custom plan for the account", async () => {
+        vi.mocked(getPlanById).mockResolvedValue(mockPlan);
+        await expect(
+            getPlan("plan-1", "account-3")
+        ).rejects.toThrow("You cannot view another account's custom plan");
+
+        expect(getPlanById).toHaveBeenCalledWith("plan-1");
+    });
+
 });
 
 

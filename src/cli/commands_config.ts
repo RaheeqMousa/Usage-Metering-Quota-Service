@@ -48,7 +48,8 @@ export async function getPlanHandler(_cmdName: string, ...args: string[]): Promi
     throw new Error("failed to retrieve plans");
   }
 
-  const plan = await getPlan(planId);
+  const {accountId}= await getLoggedInCredentials();
+  const plan = await getPlan(planId, accountId);
   console.log(plan);
 }
 
