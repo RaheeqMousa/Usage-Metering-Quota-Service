@@ -23,7 +23,7 @@ Before running the project, ensure you have installed <br>
 
 ## How to start
 1. clone the repository <br>
-   git clone https://github.com/RaheeqMousa/Usage-Metering-Quota-Service
+   git clone https://github.com/RaheeqMousa/Usage-Metering-Quota-Service<br>
    cd Usage-Metering-Quota-Service
 2. Configure environment variables<br>
    Create a .env file in the project root directory
