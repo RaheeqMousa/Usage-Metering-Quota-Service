@@ -22,10 +22,10 @@ Before running the project, ensure you have installed <br>
 <a href="https://docs.docker.com/compose/">Docker Compose</a>
 
 ## How to start
-1. clone the repository
-   git clone <repository-url>
+1. clone the repository <br>
+   git clone https://github.com/RaheeqMousa/Usage-Metering-Quota-Service
    cd Usage-Metering-Quota-Service
-2. Configure environment variables
+2. Configure environment variables<br>
    Create a .env file in the project root directory
    put these variables:<br>
    PORT=....<br>
